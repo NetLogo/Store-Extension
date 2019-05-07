@@ -1,0 +1,29 @@
+StoreBasics
+  extensions [ store ]
+  globals [ asserts ]
+  to assert-equal [v1 v2] if (not (v1 = v2)) [ error (word "Assert #" asserts ": Values are not equal (expected: " v1 ", actual: " v2 ")") ] set asserts (asserts + 1) end
+  O> store:put "first-thing" "1234"
+  O> store:get "first-thing" [ v -> assert-equal "1234" v ]
+  O> store:put "first-thing" "123456789" [ store:get "first-thing" [ v -> assert-equal "123456789" v ] ]
+  O> store:has-key "first-thing" [ b -> assert-equal true b ]
+  O> store:has-key "second-thing" [ b -> assert-equal false b ]
+
+  O> store:put "second-thing" "apples"
+  O> store:has-key "first-thing" [ b -> assert-equal true b ]
+  O> store:has-key "second-thing" [ b -> assert-equal true b ]
+  O> store:get "first-thing" [ v -> assert-equal "123456789" v ]
+  O> store:get "second-thing" [ v -> assert-equal "apples" v ]
+  O> store:get-keys [ keys -> assert-equal ["first-thing" "second-thing"] keys ]
+
+  O> store:remove "first-thing"
+  O> store:has-key "first-thing" [ b -> assert-equal false b ]
+  O> store:has-key "second-thing" [ b -> assert-equal true b ]
+  O> store:get "second-thing" [ v -> assert-equal "apples" v ]
+  O> store:get-keys [ keys -> assert-equal ["second-thing"] keys ]
+
+  O> store:clear
+  O> store:has-key "first-thing" [ b -> assert-equal false b ]
+  O> store:has-key "second-thing" [ b -> assert-equal false b ]
+  O> store:get-keys [ keys -> assert-equal [] keys ]
+
+  O> store:get "nope" [ v -> show v ] => ERROR Extension exception: Could not find a value for key: 'nope'.
