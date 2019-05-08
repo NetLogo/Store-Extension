@@ -16,7 +16,7 @@ scalaSource in Compile := baseDirectory.value / "src"
 
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xfatal-warnings", "-encoding", "us-ascii")
 
-libraryDependencies += "org.apache.derby" % "derby" % "10.15.1.3"
+libraryDependencies += "com.h2database" % "h2" % "1.4.199"
 
 // The remainder of this file is for options specific to bundled netlogo extensions
 // if copying this extension to build your own, you need nothing past line 14 to build
