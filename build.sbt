@@ -14,7 +14,7 @@ scalaVersion := "2.12.8"
 
 scalaSource in Compile := baseDirectory.value / "src"
 
-scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xfatal-warnings", "-encoding", "us-ascii")
+scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xlint", "-Xfatal-warnings", "-encoding", "us-ascii")
 
 libraryDependencies += "com.h2database" % "h2" % "1.4.199"
 

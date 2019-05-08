@@ -1,10 +1,6 @@
 package org.nlogo.extension.store
 
-import java.io.IOException
-import java.nio.charset.Charset
-import java.nio.file.{ Files, InvalidPathException, Path, Paths }
-
-import org.nlogo.api.{ Argument, Context, DefaultClassManager, ExtensionException, ExtensionManager, PrimitiveManager, ScalaConversions, Command }
+import org.nlogo.api.{ Argument, Command, Context, DefaultClassManager, ExtensionException, ExtensionManager, PrimitiveManager, ScalaConversions }
 import org.nlogo.nvm.{ AssemblerAssistant, CustomAssembled, ExtensionContext }
 import org.nlogo.core.Syntax
 import org.nlogo.agent.AgentSet

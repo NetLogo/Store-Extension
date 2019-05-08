@@ -3,7 +3,7 @@ package org.nlogo.extension.store
 import scala.collection.mutable.ArrayBuffer
 
 import org.h2.Driver
-import java.sql.{ Connection, DriverManager, PreparedStatement, Statement }
+import java.sql.{ DriverManager, PreparedStatement }
 
 class StoreDatabase {
   val driver     = new Driver()
