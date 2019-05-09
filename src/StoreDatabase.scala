@@ -3,7 +3,8 @@ package org.nlogo.extension.store
 import scala.collection.mutable.ArrayBuffer
 
 import org.h2.Driver
-import java.sql.{ DriverManager, PreparedStatement }
+import java.lang.AutoCloseable
+import java.sql.DriverManager
 
 class StoreDatabase(folder: String) {
   val driver     = new Driver()
@@ -28,22 +29,17 @@ class StoreDatabase(folder: String) {
 
   def getDatabaseKeys(): Seq[String] = {
     val keys = ArrayBuffer.empty[String]
-    try {
-      val statement = connection.createStatement
-      val records   = statement.executeQuery("select key from store")
+    withClosable(connection.createStatement()) { statement => {
+      val records = statement.executeQuery("select key from store")
       while (records.next) {
         keys += records.getString(1)
       }
-    } catch {
-      case _: Exception => keys
-    }
-    return keys
+      keys
+    } }
   }
 
   def getDatabaseValueForKey(key: String): Option[String] = {
-    var query: PreparedStatement = null
-    val value = try {
-      query = connection.prepareStatement("select value from store where key=?")
+    withClosable(connection.prepareStatement("select value from store where key=?")) { query => {
       query.setString(1, key)
       val records = query.executeQuery
       if (records.next) {
@@ -51,18 +47,11 @@ class StoreDatabase(folder: String) {
       } else {
         None
       }
-    } catch {
-      case _: Exception => None
-    } finally {
-      query.close
-    }
-    return value
+    } }
   }
 
   def checkDatabaseForKey(key: String): Boolean = {
-    var query: PreparedStatement = null
-    val value = try {
-      query = connection.prepareStatement("select count(*) > 0 from store where key=?")
+    withClosable(connection.prepareStatement("select count(*) > 0 from store where key=?")) { query => {
       query.setString(1, key)
       val records = query.executeQuery
       if (records.next) {
@@ -70,41 +59,43 @@ class StoreDatabase(folder: String) {
       } else {
         false
       }
-    } catch {
-      case _: Exception => false
-    } finally {
-      query.close
-    }
-    return value
+    } }
   }
 
   def insertDatabaseValueForKey(key: String, value: String): Unit = {
-    val insert = connection.prepareStatement("insert into store values (?, ?)")
-    insert.setString(1, key)
-    insert.setString(2, value)
-    insert.executeUpdate
-    insert.close
+    withClosable(connection.prepareStatement("insert into store values (?, ?)")) { insert => {
+      insert.setString(1, key)
+      insert.setString(2, value)
+      insert.executeUpdate
+    } }
   }
 
   def updateDatabaseValueForKey(key: String, value: String): Unit = {
-    val update = connection.prepareStatement("update store set value=? where key=?")
-    update.setString(1, value)
-    update.setString(2, key)
-    update.executeUpdate
-    update.close
+    withClosable(connection.prepareStatement("update store set value=? where key=?")) { update => {
+      update.setString(1, value)
+      update.setString(2, key)
+      update.executeUpdate
+    } }
   }
 
   def removeDatabaseValueForKey(key: String): Unit = {
-    val remove = connection.prepareStatement("delete from store where key=?")
-    remove.setString(1, key)
-    remove.executeUpdate
-    remove.close
+    withClosable(connection.prepareStatement("delete from store where key=?")) { remove => {
+      remove.setString(1, key)
+      remove.executeUpdate
+    } }
   }
 
   def clearDatabase(): Unit = {
-    val statement = connection.createStatement
-    statement.executeUpdate("truncate table store")
-    statement.close
+    withClosable(connection.createStatement()) { statement => {
+      statement.executeUpdate("truncate table store")
+    } }
   }
 
+  def withClosable[ T, C <: AutoCloseable ]( closable: C )( f: C => T ) =
+    try {
+      f( closable )
+    }
+    finally {
+      closable.close
+    }
 }
