@@ -5,8 +5,10 @@ import org.nlogo.nvm.{ AssemblerAssistant, CustomAssembled, ExtensionContext }
 import org.nlogo.core.Syntax
 import org.nlogo.agent.AgentSet
 
+import java.sql.SQLException
+
 class StoreExtension extends DefaultClassManager {
-  val store = new StoreDatabase(FileIO.perUserDir("store"))
+  val store = wrapExceptions { () => new StoreDatabase(FileIO.perUserDir("store")) }
 
   override def load(manager: PrimitiveManager): Unit = {
     manager.addPrimitive("put",      PutPrim)
@@ -36,9 +38,11 @@ class StoreExtension extends DefaultClassManager {
       val key   = args(0).getString
       val value = args(1).getString
 
-      store.checkDatabaseForKey(key) match {
-        case true  => store.updateDatabaseValueForKey(key, value)
-        case false => store.insertDatabaseValueForKey(key, value)
+      wrapExceptions { () =>
+        store.checkDatabaseForKey(key) match {
+          case true  => store.updateDatabaseValueForKey(key, value)
+          case false => store.insertDatabaseValueForKey(key, value)
+        }
       }
 
       runCommandBlock(context)
@@ -59,7 +63,7 @@ class StoreExtension extends DefaultClassManager {
 
       val key     = args(0).getString
       val command = args(1).getCommand
-      val value   = store.getDatabaseValueForKey(key)
+      val value   = wrapExceptions { () => store.getDatabaseValueForKey(key) }
 
       value match {
         case Some(v) => command.perform(context, Array[AnyRef](v))
@@ -77,7 +81,7 @@ class StoreExtension extends DefaultClassManager {
     override def perform(args: Array[Argument], context: Context): Unit = {
 
       val command = args(0).getCommand
-      val keys    = store.getDatabaseKeys
+      val keys    = wrapExceptions { () => store.getDatabaseKeys }
 
       command.perform(context, Array[AnyRef](ScalaConversions.toLogoList(keys)))
     }
@@ -92,7 +96,7 @@ class StoreExtension extends DefaultClassManager {
 
       val key     = args(0).getString
       val command = args(1).getCommand
-      val hasKey  = store.checkDatabaseForKey(key)
+      val hasKey  = wrapExceptions { () => store.checkDatabaseForKey(key) }
 
       command.perform(context, Array[AnyRef](Boolean.box(hasKey)))
     }
@@ -111,7 +115,7 @@ class StoreExtension extends DefaultClassManager {
     override def perform(args: Array[Argument], context: Context): Unit = {
 
       val key = args(0).getString
-      store.removeDatabaseValueForKey(key)
+      wrapExceptions { () => store.removeDatabaseValueForKey(key) }
 
       runCommandBlock(context)
     }
@@ -140,6 +144,13 @@ class StoreExtension extends DefaultClassManager {
     }
 
   }
+
+  def wrapExceptions[T]( f: () => T ) =
+    try {
+      f()
+    } catch {
+      case ex: SQLException => throw new ExtensionException("Error with the store database", ex)
+    }
 
   def runCommandBlock(context: Context) {
     val nvmContext = context.asInstanceOf[ExtensionContext].nvmContext
