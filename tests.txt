@@ -2,6 +2,7 @@ StoreBasics
   extensions [ store ]
   globals [ asserts ]
   to assert-equal [v1 v2] if (not (v1 = v2)) [ error (word "Assert #" asserts ": Values are not equal (expected: " v1 ", actual: " v2 ")") ] set asserts (asserts + 1) end
+  O> store:clear
   O> store:put "first-thing" "1234"
   O> store:get "first-thing" [ v -> assert-equal "1234" v ]
   O> store:put "first-thing" "123456789" [ store:get "first-thing" [ v -> assert-equal "123456789" v ] ]
