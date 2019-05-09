@@ -10,10 +10,10 @@ class StoreDatabase(folder: String) {
   val connection = DriverManager.getConnection(s"jdbc:h2:$folder/store-h2")
 
   {
-    val statement = connection.createStatement()
-    val metadata  = connection.getMetaData()
+    val statement = connection.createStatement
+    val metadata  = connection.getMetaData
     val results   = metadata.getTables(null, null, "STORE", null)
-    if (!results.next()) {
+    if (!results.next) {
       statement.execute("create table store(key varchar(max), value varchar(max))")
       statement.execute("alter table store add constraint unique_keys unique(key)")
       statement.close
@@ -29,9 +29,9 @@ class StoreDatabase(folder: String) {
   def getDatabaseKeys(): Seq[String] = {
     val keys = ArrayBuffer.empty[String]
     try {
-      val statement = connection.createStatement()
+      val statement = connection.createStatement
       val records   = statement.executeQuery("select key from store")
-      while (records.next()) {
+      while (records.next) {
         keys += records.getString(1)
       }
     } catch {
@@ -45,8 +45,8 @@ class StoreDatabase(folder: String) {
     val value = try {
       query = connection.prepareStatement("select value from store where key=?")
       query.setString(1, key)
-      val records = query.executeQuery()
-      if (records.next()) {
+      val records = query.executeQuery
+      if (records.next) {
         Some(records.getString(1))
       } else {
         None
@@ -64,8 +64,8 @@ class StoreDatabase(folder: String) {
     val value = try {
       query = connection.prepareStatement("select count(*) > 0 from store where key=?")
       query.setString(1, key)
-      val records = query.executeQuery()
-      if (records.next()) {
+      val records = query.executeQuery
+      if (records.next) {
         records.getBoolean(1)
       } else {
         false

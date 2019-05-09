@@ -18,7 +18,7 @@ class StoreExtension extends DefaultClassManager {
   }
 
   override def unload(em: ExtensionManager): Unit = {
-    store.close()
+    store.close
   }
 
   private object PutPrim extends Command with CustomAssembled {
@@ -45,8 +45,8 @@ class StoreExtension extends DefaultClassManager {
     }
 
     def assemble(a: AssemblerAssistant) {
-      a.block()
-      a.done()
+      a.block
+      a.done
     }
 
   }
@@ -77,7 +77,7 @@ class StoreExtension extends DefaultClassManager {
     override def perform(args: Array[Argument], context: Context): Unit = {
 
       val command = args(0).getCommand
-      val keys    = store.getDatabaseKeys()
+      val keys    = store.getDatabaseKeys
 
       command.perform(context, Array[AnyRef](ScalaConversions.toLogoList(keys)))
     }
@@ -117,8 +117,8 @@ class StoreExtension extends DefaultClassManager {
     }
 
     def assemble(a: AssemblerAssistant) {
-      a.block()
-      a.done()
+      a.block
+      a.done
     }
 
   }
@@ -129,14 +129,14 @@ class StoreExtension extends DefaultClassManager {
 
     override def perform(args: Array[Argument], context: Context): Unit = {
 
-      store.clearDatabase()
+      store.clearDatabase
 
       runCommandBlock(context)
     }
 
     def assemble(a: AssemblerAssistant) {
-      a.block()
-      a.done()
+      a.block
+      a.done
     }
 
   }
