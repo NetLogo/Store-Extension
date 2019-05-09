@@ -5,9 +5,9 @@ import scala.collection.mutable.ArrayBuffer
 import org.h2.Driver
 import java.sql.{ DriverManager, PreparedStatement }
 
-class StoreDatabase {
+class StoreDatabase(folder: String) {
   val driver     = new Driver()
-  val connection = DriverManager.getConnection("jdbc:h2:~/store-h2")
+  val connection = DriverManager.getConnection(s"jdbc:h2:$folder/store-h2")
 
   {
     val statement = connection.createStatement()

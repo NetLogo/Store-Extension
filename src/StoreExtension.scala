@@ -1,12 +1,12 @@
 package org.nlogo.extension.store
 
-import org.nlogo.api.{ Argument, Command, Context, DefaultClassManager, ExtensionException, ExtensionManager, PrimitiveManager, ScalaConversions }
+import org.nlogo.api.{ Argument, Command, Context, DefaultClassManager, ExtensionException, ExtensionManager, FileIO, PrimitiveManager, ScalaConversions }
 import org.nlogo.nvm.{ AssemblerAssistant, CustomAssembled, ExtensionContext }
 import org.nlogo.core.Syntax
 import org.nlogo.agent.AgentSet
 
 class StoreExtension extends DefaultClassManager {
-  val store = new StoreDatabase()
+  val store = new StoreDatabase(FileIO.perUserDir("store"))
 
   override def load(manager: PrimitiveManager): Unit = {
     manager.addPrimitive("put",      PutPrim)
