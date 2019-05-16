@@ -16,14 +16,17 @@ If you need a way to store and retrieve key/value pairs inside a program, like a
 
 ## Primitives
 
-| Prim Name | Arguments                | Behavior
-| --------- | ------------------------ | --------
-| put       | *key* *value* *callback* | Stores the given string `value` with the given string `key`, overwriting any existing value for that key.  If the optional `callback` command block is given, it is called once the `put` is complete.
-| get       | *key* *callback*         | Gets the string `value` for the given `key` and provides it as an argument to the given `callback` anonymous command.  If the given `key` is not in the store, it will raise an extension error.
-| has-key   | *key* *callback*         | Checks if the given `key` exists in the store, and provides a true/false value as an argument to the given `callback` anonymous command.
-| get-keys  | *callback*               | Gets a list of all keys in the store, and passes that list as an argument to the given `callback anonymous command.
-| remove    | *key* *callback*         | Removes the given `key` and its associated value, if any, from the store.  If the optional `callback` command block is given, it is called once the `remove` is complete.
-| clear     | *callback*               | Removes all keys and their values from the store.  If the optional `callback` command block is given, it is called once the `clear` is complete.
+| Prim Name    | Arguments                | Behavior
+| ------------ | ------------------------ | --------
+| list-stores  | *callback*               | Gets a list of all the different stores that have been created, and passes them as an argument to the given `callback` anonymous command.
+| switch-store | *store-name*             | Changes the currently used store to the one with the given name.  If it doesn't exist, it will be created.  You can switch to the default starting store by using the empty string argument, `""`.
+| delete-store | *store-name*             | Deletes the store with the given name.  You cannot delete the currently used store, or the default store named `""`.
+| put          | *key* *value* *callback* | Stores the given string `value` with the given string `key`, overwriting any existing value for that key.  If the optional `callback` command block is given, it is called once the `put` is complete.
+| get          | *key* *callback*         | Gets the string `value` for the given `key` and provides it as an argument to the given `callback` anonymous command.  If the given `key` is not in the store, it will raise an extension error.
+| has-key      | *key* *callback*         | Checks if the given `key` exists in the store, and provides a true/false value as an argument to the given `callback` anonymous command.
+| get-keys     | *callback*               | Gets a list of all keys in the store, and passes that list as an argument to the given `callback anonymous command.
+| remove       | *key* *callback*         | Removes the given `key` and its associated value, if any, from the store.  If the optional `callback` command block is given, it is called once the `remove` is complete.
+| clear        | *callback*               | Removes all keys and their values from the store.  If the optional `callback` command block is given, it is called once the `clear` is complete.
 
 ## Storage Location
 
