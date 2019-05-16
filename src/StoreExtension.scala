@@ -8,9 +8,13 @@ import org.nlogo.agent.AgentSet
 import java.sql.SQLException
 
 class StoreExtension extends DefaultClassManager {
-  val store = wrapExceptions { () => new StoreDatabase(FileIO.perUserDir("store")) }
+  val store = new StoreDatabase(FileIO.perUserDir("store"))
 
   override def load(manager: PrimitiveManager): Unit = {
+    manager.addPrimitive("list-stores",  ListStoresPrim)
+    manager.addPrimitive("switch-store", SwitchStorePrim)
+    manager.addPrimitive("delete-store", DeleteStorePrim)
+
     manager.addPrimitive("put",      PutPrim)
     manager.addPrimitive("get",      GetPrim)
     manager.addPrimitive("get-keys", GetKeysPrim)
@@ -21,6 +25,46 @@ class StoreExtension extends DefaultClassManager {
 
   override def unload(em: ExtensionManager): Unit = {
     store.close
+  }
+
+  private object ListStoresPrim extends Command {
+    override def getSyntax = Syntax.commandSyntax(right = List(Syntax.CommandType))
+
+    override def perform(args: Array[Argument], context: Context): Unit = {
+
+      val command = args(0).getCommand
+      val tables  = wrapExceptions { () => store.getStoreTables() }
+      command.perform(context, Array[AnyRef](ScalaConversions.toLogoList(tables)))
+    }
+  }
+
+  private object SwitchStorePrim extends Command {
+    override def getSyntax = Syntax.commandSyntax(right = List(Syntax.StringType))
+
+    override def perform(args: Array[Argument], context: Context): Unit = {
+
+      val name = args(0).getString
+      wrapExceptions { () => store.setStore(name) }
+    }
+  }
+
+  private object DeleteStorePrim extends Command {
+    override def getSyntax = Syntax.commandSyntax(right = List(Syntax.StringType))
+
+    override def perform(args: Array[Argument], context: Context): Unit = {
+
+      val name = args(0).getString
+
+      if (name == "" || name == "Default Store") {
+        throw new ExtensionException("Cannot delete the default store, but you can clear it if you want.")
+      }
+
+      if (store.isCurrentStore(name)) {
+        throw new ExtensionException("Cannot delete the current store, switch to another store first.")
+      }
+
+      wrapExceptions { () => store.deleteStore(name) }
+    }
   }
 
   private object PutPrim extends Command with CustomAssembled {
