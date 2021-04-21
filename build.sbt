@@ -24,4 +24,5 @@ libraryDependencies += "com.h2database" % "h2" % "1.4.199"
 netLogoTarget :=
   org.nlogo.build.NetLogoExtension.directoryTarget(baseDirectory.value)
 
-netLogoVersion := "6.1.0-RC2"
+resolvers      += "netlogo" at "https://dl.cloudsmith.io/public/netlogo/netlogo/maven/"
+netLogoVersion := "6.2.0-d27b502"
