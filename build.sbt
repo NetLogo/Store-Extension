@@ -1,7 +1,7 @@
 enablePlugins(org.nlogo.build.NetLogoExtension)
 
 name       := "store"
-version    := "1.0.2"
+version    := "1.0.1"
 isSnapshot := true
 
 scalaVersion           := "3.7.0"
