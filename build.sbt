@@ -14,4 +14,4 @@ libraryDependencies += "com.h2database" % "h2" % "1.4.199"
 
 netLogoExtName      := "store"
 netLogoClassManager := "org.nlogo.extension.store.StoreExtension"
-netLogoVersion      := "7.0.1"
+netLogoVersion      := "7.0.3"
