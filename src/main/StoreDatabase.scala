@@ -51,25 +51,25 @@ class StoreDatabase(folder: String) {
 
   def getStoreTables(): Seq[String] = {
     val tables = ArrayBuffer.empty[String]
-    withClosable(connection.createStatement()) { statement => {
+    withClosable(connection.createStatement()) { statement =>
       val records = statement.executeQuery("select name from __stores_table")
       while (records.next) {
         tables += records.getString(1)
       }
       tables.toSeq
-    } }
+    }
   }
 
   def getStoreNumber(name: String): Option[Int] = {
-    withClosable(connection.prepareStatement("select store_number from __stores_table where name=?")) { query => {
+    withClosable(connection.prepareStatement("select store_number from __stores_table where name=?")) { query =>
       query.setString(1, name)
       val records = query.executeQuery
       if (records.next) {
-        return Some(records.getInt(1))
+        Some(records.getInt(1))
       } else {
-        return None
+        None
       }
-    } }
+    }
   }
 
   def isCurrentStore(name: String): Boolean = {
@@ -103,28 +103,26 @@ class StoreDatabase(folder: String) {
   def setStore(name: String): Unit = {
     if (name == "" || name == "Default Store") {
       currentStore = "default_store"
-      return
+    } else {
+      val storeNumber = getStoreNumber(name) match {
+        case Some(n) => n
+        case None    => createStore(name)
+      }
+      currentStore = storeTableNameFromNumber(storeNumber)
     }
-
-
-    val storeNumber = getStoreNumber(name) match {
-      case Some(n) => n
-      case None    => createStore(name)
-    }
-    currentStore = storeTableNameFromNumber(storeNumber)
   }
 
   def deleteStore(name: String, storeNumber: Int): Unit = {
     val storeName = storeTableNameFromNumber(storeNumber)
 
-    withClosable(connection.prepareStatement(s"delete from __stores_table where name=?")) { remove => {
+    withClosable(connection.prepareStatement(s"delete from __stores_table where name=?")) { remove =>
       remove.setString(1, name)
       remove.executeUpdate
-    } }
+    }
 
-    withClosable(connection.createStatement()) { statement => {
+    withClosable(connection.createStatement()) { statement =>
       statement.execute(s"drop table ${storeName}")
-    } }
+    }
   }
 
   def deleteStore(name: String): Unit = {
@@ -136,17 +134,17 @@ class StoreDatabase(folder: String) {
 
   def getDatabaseKeys(): Seq[String] = {
     val keys = ArrayBuffer.empty[String]
-    withClosable(connection.createStatement()) { statement => {
+    withClosable(connection.createStatement()) { statement =>
       val records = statement.executeQuery(s"select key from ${currentStore}")
       while (records.next) {
         keys += records.getString(1)
       }
-      keys
-    } }
+      keys.toSeq
+    }
   }
 
   def getDatabaseValueForKey(key: String): Option[String] = {
-    withClosable(connection.prepareStatement(s"select value from ${currentStore} where key=?")) { query => {
+    withClosable(connection.prepareStatement(s"select value from ${currentStore} where key=?")) { query =>
       query.setString(1, key)
       val records = query.executeQuery
       if (records.next) {
@@ -154,7 +152,7 @@ class StoreDatabase(folder: String) {
       } else {
         None
       }
-    } }
+    }
   }
 
   def checkDatabaseForKey(key: String): Boolean = {

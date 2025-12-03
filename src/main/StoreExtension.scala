@@ -31,7 +31,6 @@ class StoreExtension extends DefaultClassManager {
     override def getSyntax = Syntax.commandSyntax(right = List(Syntax.CommandType))
 
     override def perform(args: Array[Argument], context: Context): Unit = {
-
       val command = args(0).getCommand
       val tables  = wrapExceptions { () => store.getStoreTables() }
       command.perform(context, Array[AnyRef](ScalaConversions.toLogoList(tables)))
@@ -123,10 +122,8 @@ class StoreExtension extends DefaultClassManager {
     override def getSyntax = Syntax.commandSyntax(right = List(Syntax.CommandType))
 
     override def perform(args: Array[Argument], context: Context): Unit = {
-
       val command = args(0).getCommand
       val keys    = wrapExceptions { () => store.getDatabaseKeys() }
-
       command.perform(context, Array[AnyRef](ScalaConversions.toLogoList(keys)))
     }
 
@@ -137,11 +134,9 @@ class StoreExtension extends DefaultClassManager {
     override def getSyntax = Syntax.commandSyntax(right = List(Syntax.StringType, Syntax.CommandType))
 
     override def perform(args: Array[Argument], context: Context): Unit = {
-
       val key     = args(0).getString
       val command = args(1).getCommand
       val hasKey  = wrapExceptions { () => store.checkDatabaseForKey(key) }
-
       command.perform(context, Array[AnyRef](Boolean.box(hasKey)))
     }
 
@@ -157,10 +152,8 @@ class StoreExtension extends DefaultClassManager {
     )
 
     override def perform(args: Array[Argument], context: Context): Unit = {
-
       val key = args(0).getString
       wrapExceptions { () => store.removeDatabaseValueForKey(key) }
-
       runCommandBlock(context)
     }
 
@@ -176,9 +169,7 @@ class StoreExtension extends DefaultClassManager {
     override def getSyntax = Syntax.commandSyntax(right = List(Syntax.CommandBlockType | Syntax.OptionalType))
 
     override def perform(args: Array[Argument], context: Context): Unit = {
-
       store.clearDatabase()
-
       runCommandBlock(context)
     }
 
@@ -189,7 +180,7 @@ class StoreExtension extends DefaultClassManager {
 
   }
 
-  def wrapExceptions[T]( f: () => T ) =
+  def wrapExceptions[T](f: () => T): T =
     try {
       f()
     } catch {
