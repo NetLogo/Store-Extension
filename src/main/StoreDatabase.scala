@@ -32,7 +32,7 @@ class StoreDatabase(folder: String) {
     statement.close
   }
 
-  def close() = {
+  def close(): Unit = {
     if (connection != null) {
       connection.close
     }
@@ -56,7 +56,7 @@ class StoreDatabase(folder: String) {
       while (records.next) {
         tables += records.getString(1)
       }
-      tables
+      tables.toSeq
     } }
   }
 

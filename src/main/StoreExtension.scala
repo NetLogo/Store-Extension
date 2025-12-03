@@ -24,7 +24,7 @@ class StoreExtension extends DefaultClassManager {
   }
 
   override def unload(em: ExtensionManager): Unit = {
-    store.close
+    store.close()
   }
 
   private object ListStoresPrim extends Command {
@@ -92,9 +92,9 @@ class StoreExtension extends DefaultClassManager {
       runCommandBlock(context)
     }
 
-    def assemble(a: AssemblerAssistant) {
-      a.block
-      a.done
+    def assemble(a: AssemblerAssistant): Unit = {
+      a.block()
+      a.done()
     }
 
   }
@@ -125,7 +125,7 @@ class StoreExtension extends DefaultClassManager {
     override def perform(args: Array[Argument], context: Context): Unit = {
 
       val command = args(0).getCommand
-      val keys    = wrapExceptions { () => store.getDatabaseKeys }
+      val keys    = wrapExceptions { () => store.getDatabaseKeys() }
 
       command.perform(context, Array[AnyRef](ScalaConversions.toLogoList(keys)))
     }
@@ -164,9 +164,9 @@ class StoreExtension extends DefaultClassManager {
       runCommandBlock(context)
     }
 
-    def assemble(a: AssemblerAssistant) {
-      a.block
-      a.done
+    def assemble(a: AssemblerAssistant): Unit = {
+      a.block()
+      a.done()
     }
 
   }
@@ -177,14 +177,14 @@ class StoreExtension extends DefaultClassManager {
 
     override def perform(args: Array[Argument], context: Context): Unit = {
 
-      store.clearDatabase
+      store.clearDatabase()
 
       runCommandBlock(context)
     }
 
-    def assemble(a: AssemblerAssistant) {
-      a.block
-      a.done
+    def assemble(a: AssemblerAssistant): Unit = {
+      a.block()
+      a.done()
     }
 
   }
@@ -196,7 +196,7 @@ class StoreExtension extends DefaultClassManager {
       case ex: SQLException => throw new ExtensionException("Error with the store database", ex)
     }
 
-  def runCommandBlock(context: Context) {
+  def runCommandBlock(context: Context): Unit = {
     val nvmContext = context.asInstanceOf[ExtensionContext].nvmContext
     val agentSet   = AgentSet.fromAgent(nvmContext.agent)
     nvmContext.runExclusiveJob(agentSet, nvmContext.ip + 1)
